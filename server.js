@@ -4,6 +4,7 @@ const app = express()
 const weatherdata = require("./data/weather.json");
 const axios = require('axios')
 const dotenv = require("dotenv")
+const getWeather = require('./weather.js')
 
 dotenv.config()
 
@@ -15,17 +16,9 @@ class Forecast {
     }
 }
 
-app.get('/', function (request, response) {
-    response.send("hello")
-})
 
 app.get('/weather', async function (request, response) {
-    let cityData = await axios.get(`http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.REACT_APP_WEATHER_APT_KEY}&city=${request.query.searchQuery}`)
-    //  response.send(cityData.data)
-    console.log(cityData.data)
-    let forecastData = cityData.data.data.map(function (element) {
-        return new Forecast(element.datetime, element.weather.description)
-    })
+    let forecastData = await getWeather(request.query.searchQuery)
     response.send(forecastData)
 })
 
@@ -51,29 +44,30 @@ class Movie {
     }
 }
 
-let movieArray = [
-    Movie.adult,
-    Movie.backdrop_path,
-    Movie.genre_ids,
-    Movie.id,
-    Movie.original_language,
-    Movie.original_title,
-    Movie.overview,
-    Movie.popularity,
-    Movie.release_date,
-    Movie.title,
-    Movie.video,
-    Movie.vote_average,
-    Movie.vote_count];
+// let movieArray = [
+//     Movie.adult,
+//     Movie.backdrop_path,
+//     Movie.genre_ids,
+//     Movie.id,
+//     Movie.original_language,
+//     Movie.original_title,
+//     Movie.overview,
+//     Movie.popularity,
+//     Movie.release_date,
+//     Movie.title,
+//     Movie.video,
+//     Movie.vote_average,
+//     Movie.vote_count];
     // console.log(movieArray);
 app.get('/movies', async function (request, response) {
+    
     let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.REACT_APP_MOVIE_APT_KEY}&query=${request.query.searchQuery}`, headers = headers)
     console.log(movieResponse.data.results)
     response.send(movieResponse.data.results)
 })
-// app.use((err, req, res, next) => {
-//     console.error(err.stack)
-//     res.status(500).send('Something broke!')
-//   })
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
+  })
 
 app.listen(3001)
