@@ -1,4 +1,7 @@
-const axios = require('axios')
+const axios = require('axios');
+const NodeCache = require('node-cache');
+const cache = new NodeCache();
+
 
 let headers = {
     accept: 'application/json',
@@ -14,6 +17,7 @@ class Movie {
         this.original_title = original_title
         this.overview = overview
         this.popularity = popularity
+        this.poster_path
         this.release_date = release_date
         this.title = title
         this.video = video
@@ -23,11 +27,19 @@ class Movie {
 }
 
 async function getMovies(searchQuery){
-    let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.REACT_APP_MOVIE_APT_KEY}&query=${searchQuery}`, headers = headers)
-    let movieData = movieResponse.data.results
+    // Check cache for cityData
+    let moviedata = cache.get(searchQuery);
+    // If cache doesn't have cityData send a request and update cache
+    if (moviedata === undefined) {
+        let movieResponse = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.REACT_APP_MOVIE_APT_KEY}&query=${searchQuery}`, headers = headers)
+        moviedata = movieResponse.data.results;
+        cache.set(searchQuery, moviedata, 5000);
+        return (moviedata)
+    }
+    else {
+        return (cache.get(searchQuery))
+    }
 
-    return (
-        movieData
-    )
+    
 }
 module.exports = getMovies

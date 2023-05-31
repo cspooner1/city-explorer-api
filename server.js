@@ -1,9 +1,7 @@
-const express = require("express")
-const cors = require('cors')
-const app = express()
-const weatherdata = require("./data/weather.json");
-const axios = require('axios')
-const dotenv = require("dotenv")
+const express = require("express");
+const cors = require('cors');
+const app = express();
+const dotenv = require("dotenv");
 const getWeather = require('./weather.js');
 const getMovies = require('./movies.js');
 
